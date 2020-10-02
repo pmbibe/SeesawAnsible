@@ -3,10 +3,10 @@ seesaw_vip:
     ipv4: "192.168.141.244/24"
 node:
     nodeA:
-        fqdn: "ControllerNode."
-        ipv4: "192.168.141.243/24"
+        fqdn: "TestScript"
+        ipv4: "192.168.141.240/24"
     nodeB:
-        fqdn: "ComputeNode."
+        fqdn: "ComputeNode"
         ipv4: "192.168.141.242/24"
 node_interface: {{ ansible_eth0.device }}
 lb_interface: {{ ansible_eth1.device }}        
@@ -17,11 +17,11 @@ vserver:
     rp: "admin@localdomain"
 vserver_entry:
     protocol: TCP
-    port: 6443
+    port: 80
     scheduler: RR
     healthcheck: 
       type: TCP
-      port: 6443
+      port: 80
       mode: DSR
       proxy: false
       tls_verify: false
