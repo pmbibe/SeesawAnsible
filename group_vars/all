@@ -1,0 +1,38 @@
+seesaw_vip:
+    fqdn: "seesaw-vip.localdomain."
+    ipv4: "192.168.141.244/24"
+node:
+    nodeA:
+        fqdn: "ControllerNode."
+        ipv4: "192.168.141.243/24"
+    nodeB:
+        fqdn: "ComputeNode."
+        ipv4: "192.168.141.242/24"
+node_interface: {{ ansible_eth0.device }}
+lb_interface: {{ ansible_eth1.device }}        
+vserver:
+    name: "test-vserver"
+    fqdn: "lb-test.localdomain."
+    ipv4: "192.168.141.230/24"
+    rp: "admin@localdomain"
+vserver_entry:
+    protocol: TCP
+    port: 6443
+    scheduler: RR
+    healthcheck: 
+      type: TCP
+      port: 6443
+      mode: DSR
+      proxy: false
+      tls_verify: false
+    backend:
+        hostA:
+            fqdn: "mysql-0."
+            ipv4: "192.168.141.204/24"
+            weight: 1
+        hostB:
+            fqdn: "node-master-2."
+            ipv4: "192.168.141.233/24"
+            weight: 1
+        
+

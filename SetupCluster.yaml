@@ -1,0 +1,71 @@
+- name: Installing
+  hosts: participantCluster
+  tasks:
+    - name: "Install requirement packages"
+      yum:
+        name: "{{ packages }}"
+      vars:
+        packages:
+        - wget
+        - git
+        - bison
+        - flex
+        - gcc
+    - name: "Download and Extract libnl-3.2.25.tar.gz"
+      unarchive:
+        src: https://www.infradead.org/~tgr/libnl/files/libnl-3.2.25.tar.gz
+        dest: $HOME
+        remote_src: yes
+    - name: "Configure and Install libnl"
+      shell: "cd $HOME/libnl-3.2.25 &&
+              ./configure --prefix=/usr \
+                          --sysconfdir=/etc \
+                          --disable-static  &&
+              make &&
+              make install"
+    - name: "Download and Extract go1.15.2.linux-amd64.tar.gz"
+      unarchive:
+        src: https://golang.org/dl/go1.15.2.linux-amd64.tar.gz
+        dest: /usr/local
+        remote_src: yes
+    - name: "Add /usr/local/go/bin to the PATH environment variable"
+      shell: 'data=$(cat $HOME/.bash_profile) &&
+              if [[ $data != *"/go/"* ]] ; then
+              echo export PATH=\$PATH:/usr/local/go/bin >> $HOME/.bash_profile;
+              fi' 
+    - name: "Add GOPATH to the PATH environment variable"
+      shell: 'data=$(cat $HOME/.bash_profile) &&
+              if [[ $data != "GOPATH" ]] ; then
+              echo export GOPATH=/usr/local/go/bin >> $HOME/.bash_profile;
+              fi'
+    - name: "Update PATH environment variable"
+      shell: "source $HOME/.bash_profile"
+    - name: "Pull source seesaw"
+      shell: "git clone https://github.com/google/seesaw"
+    - name: "Prepare seesaw"
+      shell: "export PATH=$PATH:/usr/local/go/bin && cd seesaw && make test && make install"
+    - name: "Install seesaw"
+      shell: 'export GOPATH=/usr/local/go/bin &&
+              cd seesaw &&
+              SEESAW_BIN="/usr/local/seesaw" &&
+              SEESAW_ETC="/etc/seesaw" &&
+              SEESAW_LOG="/var/log/seesaw" &&  
+              INIT=`ps -p 1 -o comm=` &&
+              install -d "${SEESAW_BIN}" "${SEESAW_ETC}" "${SEESAW_LOG}" &&
+              install "${GOPATH}/bin/seesaw_cli" /usr/bin/seesaw && 
+              for component in {ecu,engine,ha,healthcheck,ncc,watchdog}; do 
+                install "${GOPATH}/bin/seesaw_${component}" "${SEESAW_BIN}" ;
+              done && 
+              if [ $INIT = "init" ]; then   
+                install "etc/init/seesaw_watchdog.conf" "/etc/init"; 
+              elif [ $INIT = "systemd" ]; then   
+                install "etc/systemd/system/seesaw_watchdog.service" "/etc/systemd/system";   
+                systemctl --system daemon-reload; 
+              fi &&
+              install "etc/seesaw/watchdog.cfg" "${SEESAW_ETC}" &&
+              /sbin/setcap cap_net_raw+ep "${SEESAW_BIN}/seesaw_ha" &&
+              /sbin/setcap cap_net_raw+ep "${SEESAW_BIN}/seesaw_healthcheck"'  
+    
+
+
+    
