@@ -8,11 +8,11 @@ node: <
   ipv4: {{ node.nodeA.ipv4 }}
   status: TESTING
 >
-node: <
-  fqdn: {{ node.nodeB.fqdn }}
-  ipv4: {{ node.nodeB.fqdn }}
-  status: TESTING
->
+#node: <
+#  fqdn: {{ node.nodeB.fqdn }}
+#  ipv4: {{ node.nodeB.fqdn }}
+#  status: TESTING
+#>
 vserver: <
   name: {{ vserver.name }}
   entry_address: <
