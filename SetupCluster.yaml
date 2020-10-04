@@ -65,7 +65,15 @@
               install "etc/seesaw/watchdog.cfg" "${SEESAW_ETC}" &&
               /sbin/setcap cap_net_raw+ep "${SEESAW_BIN}/seesaw_ha" &&
               /sbin/setcap cap_net_raw+ep "${SEESAW_BIN}/seesaw_healthcheck"'  
-    
-
+    - name: "Config Seesaw"
+      template: src=seesaw.cfg dest=/etc/seesaw/seesaw.cfg
+    - name: "Config Cluster"
+      template: src=cluster.pb dest=/etc/seesaw/cluster.pb
+    - name: "Fix some issue"
+      shell: "echo ip_vs > /etc/modules-load.d/ipvs.conf &&
+              systemctl restart systemd-modules-load.service &&
+              echo nf_conntrack_ipv4 > /etc/modules-load.d/nf_conntrack.conf &&
+              systemctl restart systemd-modules-load.service &&
+              ip link add dummy1 type dummy"
 
     

@@ -7,9 +7,7 @@ node:
         ipv4: "192.168.141.240/24"
     nodeB:
         fqdn: "ComputeNode"
-        ipv4: "192.168.141.242/24"
-node_interface: {{ ansible_eth0.device }}
-lb_interface: {{ ansible_eth1.device }}        
+        ipv4: "192.168.141.242/24"    
 vserver:
     name: "test-vserver"
     fqdn: "lb-test.localdomain."
