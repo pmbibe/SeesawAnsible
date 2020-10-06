@@ -42,7 +42,7 @@ node: <
 >''' % (item, item)
     f.write(node_cluster)
 f.write(vserver)
-for item, _ in data_yaml['node'].items():
+for item, _ in data_yaml['vserver_entry']['backend'].items():
     backend = '''
   backend: <
     host: <

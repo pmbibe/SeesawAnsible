@@ -14,6 +14,11 @@ node: <
   ipv4: "{{ node.nodeB.ipv4 }}" 
   status: TESTING 
 >
+node: < 
+  fqdn: "{{ node.nodeC.fqdn }}" 
+  ipv4: "{{ node.nodeC.ipv4 }}" 
+  status: TESTING 
+>
 vserver: <
   name: "{{ vserver.name }}"
   entry_address: <
@@ -36,18 +41,18 @@ vserver: <
   >
   backend: <
     host: <
-      fqdn: "{{ vserver_entry.backend.nodeA.fqdn }}"
-      ipv4: "{{ vserver_entry.backend.nodeA.ipv4 }}"
+      fqdn: "{{ vserver_entry.backend.hostA.fqdn }}"
+      ipv4: "{{ vserver_entry.backend.hostA.ipv4 }}"
       status: TESTING
     >
-    weight: {{ vserver_entry.backend.nodeA.weight }}
+    weight: {{ vserver_entry.backend.hostA.weight }}
   >
   backend: <
     host: <
-      fqdn: "{{ vserver_entry.backend.nodeB.fqdn }}"
-      ipv4: "{{ vserver_entry.backend.nodeB.ipv4 }}"
+      fqdn: "{{ vserver_entry.backend.hostB.fqdn }}"
+      ipv4: "{{ vserver_entry.backend.hostB.ipv4 }}"
       status: TESTING
     >
-    weight: {{ vserver_entry.backend.nodeB.weight }}
+    weight: {{ vserver_entry.backend.hostB.weight }}
   >
 >
