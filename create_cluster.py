@@ -1,19 +1,13 @@
+import yaml
 
+f = open("./templates/cluster.pb", "w")
+seesaw_vip = '''
 seesaw_vip: <
   fqdn: "{{ seesaw_vip.fqdn }}"
   ipv4: "{{ seesaw_vip.ipv4 }}"
   status: TESTING
-> 
-node: < 
-  fqdn: "{{ node.nodeA.fqdn }}" 
-  ipv4: "{{ node.nodeA.ipv4 }}" 
-  status: TESTING 
->
-node: < 
-  fqdn: "{{ node.nodeB.fqdn }}" 
-  ipv4: "{{ node.nodeB.ipv4 }}" 
-  status: TESTING 
->
+> '''
+vserver = '''
 vserver: <
   name: "{{ vserver.name }}"
   entry_address: <
@@ -33,21 +27,31 @@ vserver: <
  #     proxy: {{ vserver_entry.healthcheck.proxy }}
       tls_verify: {{ vserver_entry.healthcheck.tls_verify }}
     >
-  >
+  >'''
+endFile = '''
+>'''
+f.write(seesaw_vip)
+with open('./group_vars/all') as template:
+    data_yaml = yaml.full_load(template)
+for item, _ in data_yaml['node'].items():
+    node_cluster = '''
+node: < 
+  fqdn: "{{ node.%s.fqdn }}" 
+  ipv4: "{{ node.%s.ipv4 }}" 
+  status: TESTING 
+>''' % (item, item)
+    f.write(node_cluster)
+f.write(vserver)
+for item, _ in data_yaml['node'].items():
+    backend = '''
   backend: <
     host: <
-      fqdn: "{{ vserver_entry.backend.nodeA.fqdn }}"
-      ipv4: "{{ vserver_entry.backend.nodeA.ipv4 }}"
+      fqdn: "{{ vserver_entry.backend.%s.fqdn }}"
+      ipv4: "{{ vserver_entry.backend.%s.ipv4 }}"
       status: TESTING
     >
-    weight: {{ vserver_entry.backend.nodeA.weight }}
-  >
-  backend: <
-    host: <
-      fqdn: "{{ vserver_entry.backend.nodeB.fqdn }}"
-      ipv4: "{{ vserver_entry.backend.nodeB.ipv4 }}"
-      status: TESTING
-    >
-    weight: {{ vserver_entry.backend.nodeB.weight }}
-  >
->
+    weight: {{ vserver_entry.backend.%s.weight }}
+  >''' % (item, item, item)
+    f.write(backend)
+f.write(endFile)
+f.close()

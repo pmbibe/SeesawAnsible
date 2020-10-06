@@ -43,9 +43,13 @@
     - name: "Pull source seesaw"
       shell: "git clone https://github.com/google/seesaw"
     - name: "Prepare seesaw"
-      shell: "export PATH=$PATH:/usr/local/go/bin && cd seesaw && make test && make install"
+      shell: "export PATH=$PATH:/usr/local/go/bin && 
+              export GOPATH=/usr/local/go/bin &&
+              cd seesaw && 
+              make install"
     - name: "Install seesaw"
       shell: 'export GOPATH=/usr/local/go/bin &&
+              export PATH=$PATH:/usr/local/go/bin &&
               cd seesaw &&
               SEESAW_BIN="/usr/local/seesaw" &&
               SEESAW_ETC="/etc/seesaw" &&
@@ -69,11 +73,28 @@
       template: src=seesaw.cfg dest=/etc/seesaw/seesaw.cfg
     - name: "Config Cluster"
       template: src=cluster.pb dest=/etc/seesaw/cluster.pb
+    - name: Inserting a line after a pattern in Ansible example 
+      loop: "{{ lookup('dict', node) }}"  
+      when: "{{ item.value.fqdn != ansible_hostname }}"
+      lineinfile:
+        path: /etc/seesaw/seesaw.cfg
+        line: peer_ipv4 = {{ item.value.ip_v4 if (ansible_hostname != item.value.fqdn) else item.value.ip_v4 }}
+        insertafter: node_ipv4.*  
     - name: "Fix some issue"
-      shell: "echo ip_vs > /etc/modules-load.d/ipvs.conf &&
+      shell: 'echo ip_vs > /etc/modules-load.d/ipvs.conf &&
               systemctl restart systemd-modules-load.service &&
               echo nf_conntrack_ipv4 > /etc/modules-load.d/nf_conntrack.conf &&
               systemctl restart systemd-modules-load.service &&
-              ip link add dummy1 type dummy"
+              ip link add dummy1 type dummy &&
+              echo "ip link add dummy1 type dummy" >> /etc/rc.local &&
+              chmod +x /etc/rc.d/rc.local'
+    - name: Start service seesaw_watchdog, in all cases
+      service:
+        name: seesaw_watchdog
+        state: started           
+    - name: Enable service seesaw_watchdog, in all cases
+      service:
+        name: seesaw_watchdog
+        enabled: yes
 
     

@@ -1,13 +1,20 @@
 seesaw_vip:
     fqdn: "seesaw-vip.localdomain."
     ipv4: "192.168.141.244/24"
+    ip_v4: "192.168.141.244"
 node:
     nodeA:
         fqdn: "TestScript"
         ipv4: "192.168.141.240/24"
+        ip_v4: "192.168.141.240"
     nodeB:
         fqdn: "ComputeNode"
-        ipv4: "192.168.141.242/24"    
+        ipv4: "192.168.141.242/24"
+        ip_v4: "192.168.141.242"  
+    nodeC:
+        fqdn: "ControllerNode"
+        ipv4: "192.168.141.243/24"
+        ip_v4: "192.168.141.243" 
 vserver:
     name: "test-vserver"
     fqdn: "lb-test.localdomain."
@@ -32,5 +39,6 @@ vserver_entry:
             fqdn: "node-master-2."
             ipv4: "192.168.141.233/24"
             weight: 1
-        
+config_server:
+    primary: "127.0.0.1"
 
